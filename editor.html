@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Healfi editor</title>
+<style>
+:root{
+  --paper:#ffffff; --mist:#f1f6fa; --line:#d6e3ec; --ink:#12324a; --soft:#5a7487;
+  --blue:#006EB9; --blue-ink:#ffffff; --sun:#FFE948; --danger:#b3261e;
+  color-scheme: light;
+  font-family: "Avenir Next", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --paper:#0f1b24; --mist:#152532; --line:#284254; --ink:#e4edf3; --soft:#9db3c3;
+         --blue:#4aa8f0; --blue-ink:#06121b; --danger:#ff8a80; color-scheme: dark; }
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--paper);color:var(--ink);display:grid;grid-template-rows:auto minmax(0,1fr);font-size:15px}
+header.top{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:3px solid var(--sun);flex-wrap:wrap}
+.brand{font-weight:700;color:var(--blue);font-size:18px;display:flex;align-items:center;gap:8px;white-space:nowrap;margin-right:8px}
+.brand .star{display:inline-grid;place-items:center;width:26px;height:26px;border:2px solid var(--blue);border-radius:50%;font-size:15px;line-height:1}
+.current{flex:1;min-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--soft)}
+.current b{color:var(--ink);font-weight:600}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#e08a00;margin-left:6px;vertical-align:middle}
+button,.btn{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--mist);color:var(--ink);padding:6px 12px;border-radius:6px;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+button:hover,.btn:hover{border-color:var(--blue)}
+button:focus-visible,.btn:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+button.primary{background:var(--blue);color:var(--blue-ink);border-color:var(--blue);font-weight:600}
+button.danger{color:var(--danger)}
+button:disabled,.btn[aria-disabled=true]{opacity:.45;cursor:default;pointer-events:none}
+.layout{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:0}
+aside{border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;background:var(--mist)}
+aside .search{padding:10px;display:flex;gap:6px}
+input[type=text],input[type=password],input[type=search],textarea{font:inherit;width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink)}
+.files{overflow:auto;flex:1;padding:0 6px 16px}
+.folder{font-size:13px;font-weight:700;color:var(--soft);padding:12px 8px 4px}
+.file{display:block;width:100%;text-align:left;background:none;border:0;border-radius:5px;padding:4px 8px;font-size:14px;color:var(--ink)}
+.file:hover{background:var(--paper)}
+.file.active{background:var(--blue);color:var(--blue-ink)}
+main{display:grid;grid-template-rows:auto minmax(0,1fr);min-height:0;min-width:0}
+.toolbar{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;border-bottom:1px solid var(--line);align-items:center}
+.toolbar .sep{width:1px;height:22px;background:var(--line);margin:0 4px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:0;border-radius:0}
+.seg button[aria-pressed=true]{background:var(--blue);color:var(--blue-ink)}
+.stage{position:relative;min-height:0}
+.stage iframe,.stage textarea{position:absolute;inset:0;width:100%;height:100%;border:0}
+.stage iframe{background:#fff}
+.stage textarea{font-family:Menlo,Consolas,monospace;font-size:13px;line-height:1.5;border-radius:0;resize:none;padding:14px;white-space:pre;overflow:auto}
+.empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:var(--soft);padding:24px;background:var(--paper)}
+.empty p{max-width:42ch;line-height:1.55}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:8px;max-width:min(90vw,560px);box-shadow:0 6px 20px rgba(0,0,0,.25);font-size:14px;line-height:1.45;display:none;z-index:50}
+.toast.error{background:var(--danger);color:#fff}
+dialog{border:1px solid var(--line);border-radius:10px;padding:0;max-width:580px;width:calc(100% - 32px);background:var(--paper);color:var(--ink)}
+dialog::backdrop{background:rgba(10,30,45,.45)}
+dialog .inner{padding:20px 22px}
+dialog h2{margin:0 0 6px;font-size:19px;color:var(--blue)}
+dialog p{margin:6px 0 12px;color:var(--soft);line-height:1.5}
+dialog label{display:block;font-size:13px;font-weight:600;margin:12px 0 4px}
+dialog .row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+dialog .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;flex-wrap:wrap}
+dialog ol{margin:6px 0 0;padding-left:20px;color:var(--soft);line-height:1.6;font-size:14px}
+dialog a{color:var(--blue)}
+.results{max-height:200px;overflow:auto;border:1px solid var(--line);border-radius:6px;margin-top:10px;font-size:13px}
+.results div{display:flex;justify-content:space-between;gap:10px;padding:4px 10px;border-bottom:1px solid var(--line)}
+.results div:last-child{border-bottom:0}
+.muted{color:var(--soft);font-size:13px}
+.hide{display:none!important}
+@media (max-width:760px){
+  .layout{grid-template-columns:1fr;grid-template-rows:minmax(0,32vh) minmax(0,1fr)}
+  aside{border-right:0;border-bottom:1px solid var(--line)}
+  dialog .row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="star">✳</span>Healfi editor</div>
+  <div class="current" id="current">Choose a page on the left</div>
+  <button class="primary" id="saveBtn" disabled title="Cmd + S">Save changes</button>
+  <a class="btn" id="liveBtn" target="_blank" rel="noopener" aria-disabled="true">View live</a>
+  <button id="dupBtn" disabled>Copy as new page</button>
+  <button class="danger" id="delBtn" disabled>Delete page</button>
+  <button id="findBtn">Find &amp; replace</button>
+  <button id="settingsBtn">Settings</button>
+</header>
+
+<div class="layout">
+  <aside>
+    <div class="search">
+      <input type="search" id="filter" placeholder="Filter pages" aria-label="Filter pages">
+      <button id="refreshBtn" title="Reload the list from GitHub" aria-label="Reload page list">↻</button>
+    </div>
+    <div class="files" id="files"><p class="muted" style="padding:8px">Connect in Settings to see your pages.</p></div>
+  </aside>
+
+  <main>
+    <div class="toolbar">
+      <div class="seg" role="group" aria-label="Editing mode">
+        <button id="modeVisual" aria-pressed="true">Visual</button>
+        <button id="modeHtml" aria-pressed="false">HTML</button>
+      </div>
+      <span class="sep"></span>
+      <span id="fmt" style="display:contents">
+        <button data-block="p">Normal text</button>
+        <button data-block="h2">Heading</button>
+        <button data-block="h3">Subheading</button>
+        <button data-cmd="bold" aria-label="Bold"><b>B</b></button>
+        <button data-cmd="italic" aria-label="Italic"><i>I</i></button>
+        <button data-cmd="insertUnorderedList">• List</button>
+        <button id="linkBtn">Link</button>
+        <button data-cmd="unlink">Remove link</button>
+        <button id="imgBtn">Insert image</button>
+        <span class="sep"></span>
+        <button data-cmd="undo">Undo</button>
+        <button data-cmd="redo">Redo</button>
+      </span>
+      <input type="file" id="imgFile" accept="image/*" class="hide">
+    </div>
+    <div class="stage">
+      <iframe id="frame" title="Page being edited"></iframe>
+      <textarea id="source" class="hide" spellcheck="false" aria-label="Page HTML"></textarea>
+      <div class="empty" id="empty"><p>Pick a page from the list to start editing. Click into the page and type, just like in a word processor, then press <b>Save changes</b>.</p></div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<dialog id="settingsDlg">
+  <div class="inner">
+    <h2>Connect to GitHub</h2>
+    <p>The editor saves directly to your repository, so it needs an access key. It is stored only in this browser.</p>
+    <ol>
+      <li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub → new fine-grained token</a>.</li>
+      <li>Give it a name like “Healfi editor” and choose an expiration date.</li>
+      <li>Under <b>Repository access</b>, choose <b>Only select repositories</b> and pick <b>healfi</b>.</li>
+      <li>Under <b>Permissions → Repository permissions</b>, set <b>Contents</b> to <b>Read and write</b>.</li>
+      <li>Click <b>Generate token</b>, copy it and paste it below.</li>
+    </ol>
+    <label for="cfgToken">Access key</label>
+    <input type="password" id="cfgToken" autocomplete="off" placeholder="github_pat_…">
+    <div class="row">
+      <div><label for="cfgOwner">Account</label><input type="text" id="cfgOwner"></div>
+      <div><label for="cfgRepo">Repository</label><input type="text" id="cfgRepo"></div>
+      <div><label for="cfgBranch">Branch</label><input type="text" id="cfgBranch"></div>
+    </div>
+    <label for="cfgBase">Live website address</label>
+    <input type="text" id="cfgBase">
+    <p class="muted">Change this when you move to your new domain, for example https://healfi.net/</p>
+    <div class="actions">
+      <button id="forgetBtn" class="danger">Forget access key</button>
+      <button id="cfgCancel">Cancel</button>
+      <button class="primary" id="cfgSave">Save and connect</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="findDlg">
+  <div class="inner">
+    <h2>Find &amp; replace on every page</h2>
+    <p>Useful for things that repeat on all pages, like the menu, footer or sidebar. It searches the pages’ HTML, so you can paste a piece of code as well as plain text. All changes are saved together in one step.</p>
+    <label for="findText">Find</label>
+    <textarea id="findText" rows="3"></textarea>
+    <label for="replText">Replace with (leave empty to remove)</label>
+    <textarea id="replText" rows="3"></textarea>
+    <div id="findStatus" class="muted" style="margin-top:10px"></div>
+    <div class="results hide" id="findResults"></div>
+    <div class="actions">
+      <button id="findClose">Close</button>
+      <button id="findGo">Search all pages</button>
+      <button class="primary" id="replGo" disabled>Replace</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+(function(){
+"use strict";
+const $ = s => document.querySelector(s);
+const KEY = "healfi-editor";
+const S = { cfg: loadCfg(), tree: new Map(), cache: new Map(), path: null, doctype: "", mode: "visual", dirty: false, busy: false, matches: [] };
+
+/* ---------- settings ---------- */
+function defaultBase(){
+  if (location.protocol.indexOf("http") === 0) return new URL("./", location.href).href;
+  return "https://lovealgo.github.io/healfi/";
+}
+function loadCfg(){
+  let c = {};
+  try { c = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch(e) {}
+  return Object.assign({ owner: "LoveAlgo", repo: "healfi", branch: "main", token: "", base: defaultBase() }, c);
+}
+function saveCfg(){ try { localStorage.setItem(KEY, JSON.stringify(S.cfg)); } catch(e) {} }
+function base(){ let b = S.cfg.base.trim(); return b.endsWith("/") ? b : b + "/"; }
+const R = () => "/repos/" + encodeURIComponent(S.cfg.owner) + "/" + encodeURIComponent(S.cfg.repo);
+const encPath = p => p.split("/").map(encodeURIComponent).join("/");
+const dirOf = p => p.includes("/") ? p.slice(0, p.lastIndexOf("/") + 1) : "";
+const nameOf = p => p.slice(p.lastIndexOf("/") + 1);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------- feedback ---------- */
+let toastTimer;
+function toast(msg, isError){
+  const t = $("#toast"); t.textContent = msg; t.className = "toast" + (isError ? " error" : ""); t.style.display = "block";
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.style.display = "none"; }, isError ? 9000 : 4500);
+}
+function setBusy(on, msg){
+  S.busy = on;
+  document.body.style.cursor = on ? "progress" : "";
+  if (on && msg) { $("#current").textContent = msg; } else { updateHeader(); }
+  updateButtons();
+}
+function setDirty(d){ S.dirty = d; updateHeader(); }
+function updateHeader(){
+  if (S.busy) return;
+  const c = $("#current");
+  c.innerHTML = S.path ? "Editing <b>" + esc(S.path) + "</b>" + (S.dirty ? '<span class="dot" title="Unsaved changes"></span>' : "") : "Choose a page on the left";
+}
+function updateButtons(){
+  const has = !!S.path && !S.busy;
+  $("#saveBtn").disabled = !has;
+  $("#dupBtn").disabled = !has;
+  $("#delBtn").disabled = !has;
+  const live = $("#liveBtn");
+  if (S.path) { live.href = base() + S.path; live.removeAttribute("aria-disabled"); }
+  else { live.removeAttribute("href"); live.setAttribute("aria-disabled", "true"); }
+}
+
+/* ---------- GitHub API ---------- */
+async function api(path, opt){
+  opt = opt || {};
+  const headers = { "Authorization": "Bearer " + S.cfg.token, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" };
+  if (opt.body) headers["Content-Type"] = "application/json";
+  let res;
+  try {
+    res = await fetch("https://api.github.com" + path, { method: opt.method || "GET", headers, body: opt.body ? JSON.stringify(opt.body) : undefined, cache: "no-store" });
+  } catch(e) { throw new Error("Could not reach GitHub. Check your internet connection and try again."); }
+  if (!res.ok) {
+    let m = ""; try { m = (await res.json()).message || ""; } catch(e) {}
+    throw new Error(explain(res.status, m));
+  }
+  return res.status === 204 ? null : res.json();
+}
+function explain(status, m){
+  if (status === 401) return "GitHub did not accept the access key. Open Settings and paste a new one.";
+  if (status === 403) return "The access key is not allowed to change this repository. Check that it has Contents set to Read and write for " + S.cfg.repo + ". (" + m + ")";
+  if (status === 404) return "GitHub could not find that. Check account, repository and branch in Settings.";
+  if (status === 409 || status === 422) return "The file was changed somewhere else in the meantime. Click ↻ to reload the list, then open the page again. (" + m + ")";
+  return "GitHub error " + status + (m ? ": " + m : "");
+}
+function bytesToB64(bytes){
+  let s = ""; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+const textToB64 = t => bytesToB64(new TextEncoder().encode(t));
+function b64ToText(b){
+  const bin = atob(b.replace(/\s/g, "")); const u = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+  return new TextDecoder("utf-8").decode(u);
+}
+async function loadTree(){
+  const t = await api(R() + "/git/trees/" + encodeURIComponent(S.cfg.branch) + "?recursive=1");
+  S.tree.clear();
+  t.tree.forEach(e => { if (e.type === "blob") S.tree.set(e.path, e.sha); });
+  renderFiles();
+}
+async function readFile(path){
+  const sha = S.tree.get(path);
+  if (S.cache.has(sha)) return S.cache.get(sha);
+  const b = await api(R() + "/git/blobs/" + sha);
+  const text = b64ToText(b.content); S.cache.set(sha, text); return text;
+}
+async function putFile(path, b64, message){
+  const body = { message, content: b64, branch: S.cfg.branch };
+  if (S.tree.has(path)) body.sha = S.tree.get(path);
+  const r = await api(R() + "/contents/" + encPath(path), { method: "PUT", body });
+  S.tree.set(path, r.content.sha);
+  return r.content.sha;
+}
+async function commitMany(files, message){
+  const br = encodeURIComponent(S.cfg.branch);
+  const ref = await api(R() + "/git/ref/heads/" + br);
+  const head = ref.object.sha;
+  const commit = await api(R() + "/git/commits/" + head);
+  const tree = await api(R() + "/git/trees", { method: "POST", body: { base_tree: commit.tree.sha, tree: files.map(f => ({ path: f.path, mode: "100644", type: "blob", content: f.content })) } });
+  const nc = await api(R() + "/git/commits", { method: "POST", body: { message, tree: tree.sha, parents: [head] } });
+  await api(R() + "/git/refs/heads/" + br, { method: "PATCH", body: { sha: nc.sha } });
+}
+
+/* ---------- page list ---------- */
+function pages(){
+  return [...S.tree.keys()].filter(p => /\.html?$/i.test(p) && p !== "editor.html" && !p.startsWith("editor/")).sort((a, b) => {
+    const da = dirOf(a), db = dirOf(b);
+    if (da !== db) { if (!da) return -1; if (!db) return 1; return da.localeCompare(db); }
+    return a.localeCompare(b);
+  });
+}
+function renderFiles(){
+  const q = $("#filter").value.trim().toLowerCase();
+  const list = pages().filter(p => !q || p.toLowerCase().includes(q));
+  const box = $("#files");
+  if (!list.length) { box.innerHTML = '<p class="muted" style="padding:8px">' + (S.tree.size ? "No pages match." : "Connect in Settings to see your pages.") + "</p>"; return; }
+  let html = "", lastDir = null;
+  list.forEach(p => {
+    const d = dirOf(p);
+    if (d !== lastDir) { html += '<div class="folder">' + (d ? esc(d.slice(0, -1)) : "Main pages") + "</div>"; lastDir = d; }
+    html += '<button class="file' + (p === S.path ? " active" : "") + '" data-path="' + esc(p) + '">' + esc(nameOf(p).replace(/\.html?$/i, "")) + "</button>";
+  });
+  box.innerHTML = html;
+}
+$("#files").addEventListener("click", e => { const b = e.target.closest(".file"); if (b) openPage(b.dataset.path); });
+$("#filter").addEventListener("input", renderFiles);
+$("#refreshBtn").addEventListener("click", async () => {
+  try { setBusy(true, "Reloading list…"); await loadTree(); toast("Page list reloaded."); }
+  catch(e) { toast(e.message, true); } finally { setBusy(false); }
+});
+
+/* ---------- editing ---------- */
+const frame = $("#frame"), source = $("#source");
+function fdoc(){ return frame.contentDocument; }
+
+async function openPage(path){
+  if (S.busy) return;
+  if (S.dirty && !confirm("You have unsaved changes on " + S.path + ". Leave without saving?")) return;
+  setBusy(true, "Opening " + path + "…");
+  try {
+    const text = await readFile(path);
+    S.path = path;
+    S.doctype = (text.match(/^\s*<!DOCTYPE[^>]*>/i) || [""])[0].trim();
+    $("#empty").classList.add("hide");
+    if (S.mode === "visual") loadVisual(text); else source.value = text;
+    S.dirty = false;
+    renderFiles();
+  } catch(e) { toast(e.message, true); }
+  finally { setBusy(false); }
+}
+
+function loadVisual(text){
+  let html = text.replace(/<script\b/gi, '<script data-he-off="1" type="text/plain"');
+  const tag = '<base id="he-base" href="' + esc(base() + dirOf(S.path)) + '">';
+  html = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, m => m + tag) : tag + html;
+  frame.onload = () => {
+    const d = fdoc(); if (!d) return;
+    d.designMode = "on";
+    d.addEventListener("input", () => setDirty(true));
+    d.addEventListener("keydown", shortcut);
+  };
+  frame.srcdoc = html;
+}
+
+function serializeVisual(){
+  const root = fdoc().documentElement.cloneNode(true);
+  root.querySelectorAll("#he-base").forEach(n => n.remove());
+  root.querySelectorAll("script[data-he-off]").forEach(s => {
+    s.removeAttribute("data-he-off");
+    if (s.getAttribute("type") === "text/plain") s.removeAttribute("type");
+  });
+  root.querySelectorAll("img[data-he-src]").forEach(i => { i.setAttribute("src", i.getAttribute("data-he-src")); i.removeAttribute("data-he-src"); });
+  return (S.doctype ? S.doctype + "\n" : "") + root.outerHTML + "\n";
+}
+function currentText(){ return S.mode === "visual" ? serializeVisual() : source.value; }
+
+function setMode(m){
+  if (m === S.mode) return;
+  if (S.path) {
+    if (m === "html") source.value = serializeVisual();
+    else loadVisual(source.value);
+  }
+  S.mode = m;
+  $("#modeVisual").setAttribute("aria-pressed", m === "visual");
+  $("#modeHtml").setAttribute("aria-pressed", m === "html");
+  frame.classList.toggle("hide", m !== "visual");
+  source.classList.toggle("hide", m !== "html");
+  $("#fmt").classList.toggle("hide", m !== "visual");
+}
+$("#modeVisual").addEventListener("click", () => setMode("visual"));
+$("#modeHtml").addEventListener("click", () => setMode("html"));
+source.addEventListener("input", () => setDirty(true));
+
+function exec(cmd, val){
+  if (!S.path || S.mode !== "visual") return;
+  frame.contentWindow.focus();
+  fdoc().execCommand(cmd, false, val);
+  setDirty(true);
+}
+document.querySelectorAll("#fmt button").forEach(b => b.addEventListener("mousedown", e => e.preventDefault()));
+document.querySelectorAll("[data-cmd]").forEach(b => b.addEventListener("click", () => exec(b.dataset.cmd)));
+document.querySelectorAll("[data-block]").forEach(b => b.addEventListener("click", () => exec("formatBlock", "<" + b.dataset.block + ">")));
+$("#linkBtn").addEventListener("click", () => {
+  if (!S.path) return;
+  const sel = fdoc().getSelection();
+  if (!sel || sel.isCollapsed) { toast("Select the words you want to turn into a link first."); return; }
+  const url = prompt("Link address: another page such as nutrition.html, or a full web address starting with https://");
+  if (url) exec("createLink", url.trim());
+});
+
+/* images */
+$("#imgBtn").addEventListener("click", () => { if (S.path) $("#imgFile").click(); });
+$("#imgFile").addEventListener("change", async e => {
+  const file = e.target.files[0]; e.target.value = "";
+  if (!file || !S.path) return;
+  if (file.size > 5 * 1024 * 1024) { toast("That image is over 5 MB. Please make it smaller first (for example by exporting it at 1200 pixels wide).", true); return; }
+  let name = file.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9._-]/g, "") || "image.jpg";
+  let path = "uploads/" + name, n = 2;
+  while (S.tree.has(path)) { path = "uploads/" + name.replace(/(\.[^.]*)?$/, "-" + n + "$1"); n++; }
+  setBusy(true, "Uploading " + name + "…");
+  try {
+    const buf = new Uint8Array(await file.arrayBuffer());
+    await putFile(path, bytesToB64(buf), "Add image " + path);
+    const rel = "../".repeat(S.path.split("/").length - 1) + path;
+    const dataUrl = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); });
+    setBusy(false);
+    exec("insertHTML", '<img src="' + dataUrl + '" data-he-src="' + esc(rel) + '" alt="" style="max-width:100%">');
+    toast("Image uploaded. Remember to save the page.");
+  } catch(err) { toast(err.message, true); }
+  finally { if (S.busy) setBusy(false); }
+});
+
+/* save */
+async function save(){
+  if (!S.path || S.busy) return;
+  const text = currentText();
+  setBusy(true, "Saving " + S.path + "…");
+  try {
+    const sha = await putFile(S.path, textToB64(text), "Edit " + S.path);
+    S.cache.set(sha, text);
+    S.dirty = false;
+    toast("Saved. The live website shows the change in about a minute.");
+  } catch(e) { toast(e.message, true); }
+  finally { setBusy(false); }
+}
+$("#saveBtn").addEventListener("click", save);
+function shortcut(e){ if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") { e.preventDefault(); save(); } }
+document.addEventListener("keydown", shortcut);
+window.addEventListener("beforeunload", e => { if (S.dirty) { e.preventDefault(); e.returnValue = ""; } });
+
+/* copy as new page */
+$("#dupBtn").addEventListener("click", async () => {
+  if (!S.path) return;
+  if (S.dirty && !confirm("Your unsaved changes will go into the new copy, not into " + S.path + ". Continue?")) return;
+  let name = prompt("Name for the new page. It goes in the same folder as this one, so images and menus keep working.", nameOf(S.path).replace(/\.html?$/i, "") + "-new");
+  if (!name) return;
+  name = name.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9._-]/g, "");
+  if (!/\.html?$/.test(name)) name += ".html";
+  const path = dirOf(S.path) + name;
+  if (S.tree.has(path)) { toast("A page called " + path + " already exists.", true); return; }
+  const text = currentText();
+  setBusy(true, "Creating " + path + "…");
+  try {
+    const sha = await putFile(path, textToB64(text), "Create " + path);
+    S.cache.set(sha, text);
+    S.dirty = false;
+    setBusy(false);
+    await openPage(path);
+    toast("Created " + path + ". Add a link to it from another page so visitors can find it.");
+  } catch(e) { toast(e.message, true); }
+  finally { if (S.busy) setBusy(false); }
+});
+
+/* delete */
+$("#delBtn").addEventListener("click", async () => {
+  if (!S.path) return;
+  if (!confirm("Delete " + S.path + " from the website? Links pointing to it will stop working.")) return;
+  const path = S.path;
+  setBusy(true, "Deleting " + path + "…");
+  try {
+    await api(R() + "/contents/" + encPath(path), { method: "DELETE", body: { message: "Delete " + path, sha: S.tree.get(path), branch: S.cfg.branch } });
+    S.tree.delete(path);
+    S.path = null; S.dirty = false;
+    frame.srcdoc = ""; source.value = "";
+    $("#empty").classList.remove("hide");
+    renderFiles();
+    toast("Deleted " + path + ".");
+  } catch(e) { toast(e.message, true); }
+  finally { setBusy(false); }
+});
+
+/* ---------- find & replace ---------- */
+const findDlg = $("#findDlg");
+$("#findBtn").addEventListener("click", () => {
+  if (!S.tree.size) { toast("Connect in Settings first.", true); return; }
+  findDlg.showModal();
+});
+$("#findClose").addEventListener("click", () => findDlg.close());
+$("#findText").addEventListener("input", () => { $("#replGo").disabled = true; $("#findResults").classList.add("hide"); $("#findStatus").textContent = ""; });
+
+async function loadAll(list, onProgress){
+  let i = 0, done = 0; const out = {};
+  async function worker(){ while (i < list.length) { const p = list[i++]; out[p] = await readFile(p); onProgress(++done); } }
+  await Promise.all(Array.from({ length: 6 }, worker));
+  return out;
+}
+$("#findGo").addEventListener("click", async () => {
+  const needle = $("#findText").value;
+  if (!needle) { $("#findStatus").textContent = "Type what you want to find."; return; }
+  const list = pages(); const st = $("#findStatus");
+  $("#findGo").disabled = true;
+  try {
+    const texts = await loadAll(list, d => { st.textContent = "Reading pages… " + d + " of " + list.length; });
+    S.matches = list.map(p => ({ path: p, count: texts[p].split(needle).length - 1 })).filter(m => m.count > 0);
+    const total = S.matches.reduce((a, m) => a + m.count, 0);
+    const box = $("#findResults");
+    if (!S.matches.length) {
+      st.textContent = "Not found on any page. Check spelling, spaces and capital letters. Special characters like & appear in the HTML as &amp;.";
+      box.classList.add("hide"); $("#replGo").disabled = true;
+    } else {
+      st.textContent = "Found " + total + " time" + (total > 1 ? "s" : "") + " on " + S.matches.length + " page" + (S.matches.length > 1 ? "s" : "") + ".";
+      box.innerHTML = S.matches.map(m => "<div><span>" + esc(m.path) + "</span><span>" + m.count + "</span></div>").join("");
+      box.classList.remove("hide");
+      $("#replGo").disabled = false;
+      $("#replGo").textContent = "Replace on " + S.matches.length + " page" + (S.matches.length > 1 ? "s" : "");
+    }
+  } catch(e) { st.textContent = e.message; }
+  finally { $("#findGo").disabled = false; }
+});
+$("#replGo").addEventListener("click", async () => {
+  const needle = $("#findText").value, repl = $("#replText").value;
+  if (!needle || !S.matches.length) return;
+  if (S.path && S.dirty && S.matches.some(m => m.path === S.path) && !confirm("The page you have open has unsaved changes and will be reloaded. Discard those changes?")) return;
+  if (!confirm("Replace on " + S.matches.length + " pages? This is saved to the website straight away.")) return;
+  const st = $("#findStatus"); $("#replGo").disabled = true; $("#findGo").disabled = true;
+  try {
+    st.textContent = "Saving all changes in one step…";
+    const files = [];
+    for (const m of S.matches) files.push({ path: m.path, content: (await readFile(m.path)).split(needle).join(repl) });
+    await commitMany(files, "Find & replace on " + files.length + " pages");
+    await loadTree();
+    files.forEach(f => S.cache.set(S.tree.get(f.path), f.content));
+    st.textContent = "Done. " + files.length + " pages updated; the live website follows in about a minute.";
+    $("#findResults").classList.add("hide");
+    const reopen = S.path && files.some(f => f.path === S.path);
+    S.matches = [];
+    if (reopen) { S.dirty = false; await openPage(S.path); }
+  } catch(e) { st.textContent = e.message; }
+  finally { $("#findGo").disabled = false; }
+});
+
+/* ---------- settings dialog ---------- */
+const dlg = $("#settingsDlg");
+function openSettings(){
+  $("#cfgToken").value = S.cfg.token; $("#cfgOwner").value = S.cfg.owner; $("#cfgRepo").value = S.cfg.repo;
+  $("#cfgBranch").value = S.cfg.branch; $("#cfgBase").value = S.cfg.base;
+  dlg.showModal();
+}
+$("#settingsBtn").addEventListener("click", openSettings);
+$("#cfgCancel").addEventListener("click", () => dlg.close());
+$("#forgetBtn").addEventListener("click", () => {
+  S.cfg.token = ""; saveCfg(); $("#cfgToken").value = ""; S.tree.clear(); renderFiles(); toast("Access key removed from this browser.");
+});
+$("#cfgSave").addEventListener("click", async () => {
+  S.cfg.token = $("#cfgToken").value.trim(); S.cfg.owner = $("#cfgOwner").value.trim();
+  S.cfg.repo = $("#cfgRepo").value.trim(); S.cfg.branch = $("#cfgBranch").value.trim() || "main";
+  S.cfg.base = $("#cfgBase").value.trim() || defaultBase();
+  if (!S.cfg.token) { toast("Paste your access key first.", true); return; }
+  saveCfg();
+  setBusy(true, "Connecting…");
+  try {
+    const repo = await api(R());
+    if (repo.permissions && !repo.permissions.push) throw new Error("This access key can read the repository but not save to it. Set Contents to Read and write.");
+    await loadTree();
+    dlg.close();
+    toast("Connected. Pick a page on the left.");
+  } catch(e) { toast(e.message, true); }
+  finally { setBusy(false); }
+});
+
+/* ---------- start ---------- */
+updateButtons();
+if (!S.cfg.token) openSettings();
+else { setBusy(true, "Loading pages…"); loadTree().catch(e => toast(e.message, true)).finally(() => setBusy(false)); }
+})();
+</script>
+</body>
+</html>
