@@ -1,0 +1,415 @@
+body {
+	font: 10px 'Lucida Grande', Geneva, Arial, Verdana, sans-serif;
+	line-height: 1.7em;
+	background: #f6d617 url(../img/body-grad.gif) repeat-x;
+	margin: 0;
+	padding: 0;
+	color: #666;
+}
+img {
+	border: none;
+}
+p, blockquote {
+	margin: 1em 0;
+	font-size: 1.2em;
+    text-align: justify;
+}
+h1, h2 {
+	color: #006eb9;
+	font-weight: bold;
+	margin: 0;
+}
+h1 {
+	font-size: 1.7em;
+	margin-bottom: 0.5em
+}
+h2 {
+	font-size: 1.3em;
+	margin-bottom: 0.5em;
+}
+li {
+    font-size: 1.2em;
+}
+
+
+a {
+	color: #006eb9; text-decoration: none;
+}
+a:hover {
+	color: #006eb9; text-decoration: underline; font-weight: bold;
+}
+hr {
+    border: 0;
+    color: #dadada;
+    background-color: #dadada;
+    height: 1px;
+    margin: 2em 0;
+}
+.hr {
+    height: 20px;
+    margin: 2em 0;
+}
+
+
+blockquote {
+    margin: 1.2em 0;
+    height: auto !important; /* IE min-height workaround */
+    font-style: italic;
+
+    background: url(../img/quote-small.png) no-repeat;
+    min-height: 40px;    
+    height: 40px;
+    padding: 6px 40px 0 40px;
+}
+blockquote.large {
+    background: url(../img/quote.png) no-repeat;
+    padding: 10px 40px 0 60px;
+    min-height: 65px;
+    height: 65px;
+}
+
+
+
+
+.toolbar {
+	background-color: #eeda3d;
+	border-bottom: 1px solid #fff9c8;
+	border-color: #fdf0b7;
+	background: url(../img/login-bg.gif) repeat-x;
+
+}
+.toolbar form {
+	margin: 0;
+	padding: 2px;
+	border-bottom: 1px solid #fff9c8;
+	border-color: #d8ba18;
+}
+.toolbar .groove {
+	border-bottom: 1px solid #fff9c8;
+}
+
+.toolbar td {
+	color: #84720e;
+}
+.toolbar td a {
+	padding: 0 1.2em 0 0.5em;    
+    background: url(../img/login-header-vert.gif) repeat-y center right;
+}
+.toolbar input {
+	background-color: #edcd38;
+	font: tahoma;
+	color: #84720e;
+	width:  10em;
+	font-size: 1em;
+	padding:  0.2em;
+	font-style: italic;
+	border: 1px solid #d8ba18;
+	margin-top: -0.1em;
+}
+.toolbar a {
+	text-decoration: none;
+	color: #84720e;
+}
+.toolbar a.last {
+    background: none;
+}
+.toolbar a:hover {
+    text-decoration: underline;
+}
+.toolbar a.arrow  {
+	background: url(../img/right.gif) no-repeat center right;
+	padding: 0.2em 1.0em 0.3em 0;
+	margin-right: 4em;
+}
+.toolbar a.user {
+    background: url(../img/user.gif) no-repeat center left;
+	padding: 0.3em 0.4em 0.3em 1.5em;
+}
+.toolbar a.logout {
+    background: url(../img/logout.gif) no-repeat center left;
+	padding: 0.1em 0 0.3em 1.2em;
+}
+
+.page,
+.toolbar .inner {
+	margin: 0 auto;
+	width:  823px;
+}
+.page-inner {
+    
+}
+
+
+
+/* decorations and logo */
+#paint-stroke {
+	position: absolute;
+	top:  10px;
+	right: 0;
+	width: 550px;
+	height: 120px;
+	background: url(../img/paint-stroke.png) no-repeat;
+}
+#flowers {
+	position: absolute;
+	top:  125px;
+	left: -22px;
+	width: 87px;
+	height: 98px;
+background-image: url(../img/flowers.png);
+	
+}
+#healfi-logo {
+	margin: 16px 0 0 4px;
+	height:  78px;
+	width: 212px;	
+}
+
+
+
+.page-header {
+	height:  140px;
+	position: relative;
+	z-index: 1;
+}
+.page-header a {
+	color: #016eb7;
+	text-decoration: none;
+}
+.page-header form {
+	margin: 0;
+	padding: 0;
+}
+.page-header .menu {
+	position: absolute;
+	right: 20px;
+	bottom:  10px;
+}
+.page-header .menu a {
+	display: block;
+	float: right;
+	border-bottom:  0.3em solid;
+	margin-left:  1em;
+	padding-bottom: 0.4em;
+	font-weight: bold;
+	font-size: 1.2em;
+	border-color: #e4c319;
+	color: #1866ab;
+}
+.page-header .menu a:hover {
+	border-color:  #006eb9;
+}
+
+
+.page-top {
+	background-image: url(../img/up-mid.gif);
+	height:  43px;
+	position: relative;
+}
+.page-top .left,
+.page-top .right {
+	width:  20px;
+	height:  43px;
+}
+.page-top .left {
+	position: absolute;
+	background-image: url(../img/up-left.gif);
+	left: 0;
+}
+.page-top .right {
+	background: url(../img/up-right.gif);
+	position: absolute;
+	right: 0;
+}
+
+
+
+.cards-nav {
+	position: relative;
+    font-size: 1.1em;
+}
+.cards-nav.upper { 
+	margin-bottom: 1em;
+	z-index: 2; /* overlapping flowers */
+}
+.cards-nav.lower { 
+	margin-top: 2em;
+}
+.cards-nav .prev {	
+	position: absolute;
+	left: 0;
+}
+.cards-nav .next {	
+	position: absolute;
+	right: 0;
+}
+.cards-nav .up {
+	text-align: center;
+}
+
+
+
+
+.page-mid {
+	background: url(../img/dropshadows.png) no-repeat;
+}
+.page-mid .outer {   
+    margin: 0 6px;
+    padding: 10px 30px 10px 30px;
+    background-color: #fffdeb;
+}
+
+
+.page-mid .single,
+.page-mid .twocol,
+.page-mid .twocol-left {
+    background-image: url(../img/divider.gif);
+    background-repeat: repeat-y;
+}
+
+.page-mid .A,
+.page-mid .B {
+    overflow: hidden;
+}
+.page-mid .A {
+    float: left;
+}
+.page-mid .B {
+    float: right;
+}
+
+
+.page-mid .single {
+    background-image: none;
+}
+.page-mid .single .A,
+.page-mid .single .B {
+    float: none;
+}
+.page-mid .single .A {
+    margin-bottom: 2em;
+}
+
+
+.page-mid .twocol {
+    background-position: 50% top;
+}
+.page-mid .twocol .A,
+.page-mid .twocol .B {
+    width: 344px;
+}
+
+
+.page-mid .twocol-left {
+    background-position: 485px top;
+}
+.page-mid .twocol-left .A {
+    width: 425px;
+}
+.page-mid .twocol-left .B {
+    width: 263px;
+}
+
+
+
+.page-bottom {
+	height:  30px;
+	position: relative;
+}
+.page-bottom .left,
+.page-bottom .right {
+	width:  20px;
+	height:  30px;
+	position: absolute;
+}
+.page-bottom .left {
+	background-image: url(../img/bot-left.png);
+	left: 0;
+}
+.page-bottom .right {
+	background-image: url(../img/bot-right.png);
+	right: 0;
+}
+.page-bottom .prev {
+	position: absolute;
+	left: 10px;
+}
+.page-bottom .next {
+	position: absolute;
+	right: 10px;
+}
+.page-bottom .mid {
+	margin: 0 20px;
+	height: 30px;
+	background: url(../img/bot-mid.png) repeat-x;
+}
+
+
+.page-footer {
+	text-align: center;
+	color: #006eb9;
+	padding: 15px 28px;
+        font-size: 1.1em;
+}
+
+/* @end */
+
+/* @group independent */
+
+/* @group icons */
+
+.icon-right,
+.icon-left,
+.icon-up {
+	color: #888;
+	text-decoration: none;	
+	padding: 0.3em 0em 0.3em 1.2em;	
+}
+.icon-right {
+	background: url(../img/right.gif) no-repeat center right;
+	padding: 0.2em 1.2em 0.3em 0;
+}
+.icon-left {
+	background: url(../img/left.gif) no-repeat center left;
+}
+.icon-up {
+	background: url(../img/up.gif) no-repeat center left;
+}
+
+
+
+/* @end */
+.dropshadow {
+	background: url(../img/dropshadow.gif) repeat-x bottom left;
+	padding-bottom: 10px;
+	margin-bottom: 15px;
+	font-size: 0; /* IE fix */
+	line-height: 0;
+}
+.dropshadow img {
+/*    width: 100%;*/
+}
+.clearer {
+	clear:  both;
+}
+.image-text {
+	font: 1.3em "Times New Roman";
+	font-style: italic;
+	color: #888;
+	margin: 0 0 1em 0;
+}
+
+.healfi-card {
+	float:  right;
+	margin: 0 0 5px 20px;
+}
+
+
+/* @end */
+
+
+
+
+
+
+

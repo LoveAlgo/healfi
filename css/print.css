@@ -1,0 +1,47 @@
+
+body {
+    background: #fff;
+    padding: 0;
+    margin: 0;
+    color: #444;
+}
+img {
+    border: none;
+}
+
+div#healfi-logo {
+    border-bottom: 1px solid #dadada;
+	margin: 0;
+	height:  110px;
+	width: auto;
+}
+
+.toolbar,
+.page-top,
+.page-bottom {
+    display: none;
+}
+
+#paint-stroke,
+#flowers, 
+.page-header .menu {
+    display: none;
+}
+
+.page-mid,
+.page-mid .outer {
+    background: #fff;
+}
+
+.page-footer {
+    color: #666;
+    padding: 0;
+    margin-top: 2em;
+    padding-top: 1em;
+    border-top: 1px solid #dadada;
+    text-align: left;
+    font-size: 1.2em;
+}
+.page-footer a {
+    display: none;
+}

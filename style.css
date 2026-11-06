@@ -1,0 +1,68 @@
+body {
+color: rgb(0, 0, 0); background: rgb(255, 233, 72); 
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 14px;
+	font-style: normal;
+	line-height: normal;
+	white-space: normal;
+
+}
+
+#header {margin: 10px 10px 20px 10px; height: 95px; padding; 15px; clear: both;
+}
+
+#main {font-size: 100%; padding: 25px; margin: 10px; margin: 0px 10px 10px 80px; border: 0;
+}
+
+#sidebar {font-size: 85%; padding: 25px: margin: 0px 10px 10px 10px; width: 210px; float: left; border: 0;
+}
+
+#footer {font-size: 70%; text-align: center; padding: 15px; margin: 10px; font-size: 90%; clear: both; border: 0; width: 800px;
+}
+
+#allcontent {width: 800px: padding-top: 5px; padding-bottom: 5px; margin-left: auto; margin-right: auto;
+}
+
+h1 {
+margin-top: 0; margin-bottom: 0;
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 135%;
+	font-weight: bold; color: rgb(0, 110, 185);
+}
+h2 {
+margin-top: 0; margin-bottom: 0;
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 120%; color: rgb(0, 110, 185);
+}
+
+li { list-style-image: url (healfistar9percent.ico);
+	text-align: left;
+	font-weight: normal;
+font-size: 14px;
+	left: auto;
+	padding-top: 5px; margin-left: 30px;
+	}
+
+p {font-size: 14px
+}
+
+table {border: 0; caption-side: bottom;;
+}
+
+tr, td,, th {border: 0; padding; 0px;
+}
+
+caption {font-style: italic; padding-top: 8px;
+}
+
+hr {color: rgb(0, 110, 185);
+}
+
+a:link { color: rgb(0, 110, 185); text-decoration: none; font-weight: bold; font-size: 14px;
+}
+
+a:visited { color: rgb(0, 110, 185); text-decoration: none; font-weight: bold; font-size: 14px;
+} 
+a:hover { color: rgb(0, 110, 185); text-decoration: underline; font-weight: bold; font-size: 14px;
+} 
+

@@ -1,0 +1,358 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title> HEALFI</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="description" content="Healfi is a creative and entertaining knowledge company that helps people stay healthy.">
+<meta name="keywords" content="healfi, Healfi, HEALFI, healfier, healf, healfiest, creative health, entertaining health, global health, health knowledge, happy health, responsible health, real health, honest health, own health, new health, my health, your health, his health, her health, our health, their health, why sick, no sick, never sick, not sick, not ill, never ill, why ill, no sickness, no illness, no disease, how to heal, interim partner, interim partners, interim relationship, interim relationships, interim mate, interim mates, interim partnership, healthy relationships, honest relationships, healthy partnerships, Henrik Hillerstrom">
+<meta name="author" content="Henrik Hillerstrom">
+<meta name="identifier-url" content="http://www.healfi.com">
+<meta name="revisit-after" content="10">
+<meta name="robots" content="index,follow">
+
+<link type="text/css" rel="stylesheet" href="style.css">
+<link REL="SHORTCUT ICON" HREF="healfistar9percent.ico" />
+
+<style type="text/css">
+	
+	#dhtmlgoodies_bmi_calculator{
+		width:380px;	/* Width of entire calculator */
+		height:400px;	/* Height of entire calculator */
+		font-family: Trebuchet MS, Lucida Sans Unicode, Arial, sans-serif;	/* Fonts to use */
+	}
+	#dhtmlgoodies_bmi_calculator .calculator_form{	/* Form */
+		width:170px;	/* Width of form div */
+		float:left;	/* Position the form at the left of the graph */
+		padding-left:5px;
+		padding-right:5px;
+	}
+	#dhtmlgoodies_bmi_calculator input{
+		width:130px;
+	}
+	#dhtmlgoodies_bmi_calculator .calculator_form .textInput{
+		width:40px;	/* Width of small text inputs */
+		text-align:right;	/* Right align input text */
+	}
+	#dhtmlgoodies_bmi_calculator .calculator_graph{
+		width:198px;	/* Width of graph div */
+		float:left;	/* Position bar graph at the left */		
+		background-color:#DDD;	/* Light gray background color */
+		border:1px solid #555;	/* Gray border around graph */
+		
+		height:100%;
+		position:relative;
+	}
+	
+	.calculator_graph .graphLabels{	/* Help labels at the top of the graph */
+		background-color:#FFF;	/* White bg */
+		padding:3px;	/* Some air */
+		margin:2px;	/* Around around help div */
+		border:1px solid #555;	/* Gray border */
+
+	}
+	.graphLabels .square{	/* Small square showing BMI, e.g.: Below 18.5: Underweight */
+		height:12px;	/* Width of square */
+		width:12px;	/* Height of square */
+		border:1px solid #000;	/* Black border */
+		margin:1px; 	/* "Air" */
+		float:left;		
+	}
+	.graphLabels .label{	/* Help text, , e.g.: Below 18.5: Underweight */		
+		width:130px;	/* Width */
+		height:14px;	/* Height */
+		font-size:0.7em;	/* Font size */
+		padding-left:2px;	/* Space at the left of label */
+		float:left;
+	}
+
+	.barContainer{	/* DIV for both the multicolor bar and users weight bar */
+		position:absolute;
+		bottom:0px;
+		border:1px solid #000;
+		border-bottom:0px;
+		text-align:center;
+		vertical-align:middle;
+	}
+	.barContainer div{	/* colored div inside "barContainer */
+		border-bottom:1px solid #000;
+	}
+	.barContainer .labelSpan{	/* Label indicating users BMI */
+		background-color:#FFF;	/* White BG */
+		border:1px solid #000;	/* Black border */
+		padding:1px;	/* "Air" inside the box */
+		font-size:0.7em;	/* Font size */
+	}
+	
+	.clear{	/* Clearing div - you shouldn't do anything with this one */
+		clear:both;
+	}
+		
+	</style>
+	<script type="text/javascript">
+	/************************************************************************************************************
+	(C) www.dhtmlgoodies.com, October 2005
+	
+	This is a script from www.dhtmlgoodies.com. You will find this and a lot of other scripts at our website.	
+	
+	Terms of use:
+	You are free to use this script as long as the copyright message is kept intact. However, you may not
+	redistribute, sell or repost it without our permission.
+	
+	Thank you!
+	
+	www.dhtmlgoodies.com
+	Alf Magne Kalleland
+	
+	************************************************************************************************************/
+		
+	var useCm = true; 	// Using centimetre for height, false = inch
+	var useKg = true	// Using kilos for weight, false = pounds
+	var graphColors = ['#6600CC','#66CC00','#00CCCC','#CC0000'];
+	var graphLabels = ['Below 18.5: Underweight','18.5 &#65533; 24.9: Normal','25.0 &#65533; 29.9: Overweight','30 and above: Obese'];
+	var labelsPerRow = 1;	/* Help labels above graph */
+	var barHeight = 300; 	// Total height of bar
+	var barWidth = 50;		// Width of bars */
+	
+	// Don't change anything below this point */
+	
+	var calculatorObj;
+	var calculatorGraphObj;
+	var bmiArray = [0,18.5,25,30,60];	/* BMI VALUES */
+	var weightDiv = false;
+		
+	function calculateBMI()
+	{
+		var height = document.bmi_calculator.bmi_height.value;	
+		var weight = document.bmi_calculator.bmi_weight.value;	
+		height = height.replace(',','.');
+		weight = weight.replace(',','.');
+		if(!useKg)weight = weight / 2.2;
+		if(!useCm)height = height * 2.54;
+		
+		if(isNaN(height))return;
+		if(isNaN(weight))return;
+		
+		height = height / 100;
+		var bmi = weight / (height*height);
+		createWeightBar(bmi);		
+	}
+	
+	function createWeightBar(inputValue){
+		
+		if(!weightDiv){
+			self.status = Math.random();
+			weightDiv = document.createElement('DIV');
+			weightDiv.style.width = barWidth + 'px';
+			weightDiv.className='barContainer';
+			weightDiv.style.left = Math.round((calculatorGraphObj.offsetWidth/2) + ((calculatorGraphObj.offsetWidth/2) /2) - (barWidth/2)) + 'px';
+			calculatorGraphObj.appendChild(weightDiv);
+			var span = document.createElement('SPAN');
+			weightDiv.appendChild(span);
+			
+			var innerSpan = document.createElement('SPAN');
+			innerSpan.className='labelSpan';
+			span.appendChild(innerSpan);			
+		}else{
+			span = weightDiv.getElementsByTagName('SPAN')[0];
+			innerSpan = weightDiv.getElementsByTagName('SPAN')[1];
+		}
+		var color = graphColors[graphColors.length-1];
+		for(var no = bmiArray.length-1;no>0;no--){
+			if(bmiArray[no]>inputValue)weightDiv.style.backgroundColor = graphColors[no-1];
+		}
+		if(inputValue/1>1){
+			innerSpan.innerHTML = inputValue.toFixed(2); 
+			span.style.display='inline';
+		}else span.style.display='none';
+		var height = Math.min(Math.round(barHeight * (inputValue / bmiArray[bmiArray.length-1])),barHeight-10);
+		span.style.lineHeight = Math.round(height) + 'px';
+		weightDiv.style.height = height + 'px';
+		
+	}
+	
+	
+	function validateField()
+	{
+		this.value = this.value.replace(/[^0-9,\.]/g,'');
+		
+	}
+	
+	function initBmiCalculator()
+	{
+		calculatorObj = document.getElementById('dhtmlgoodies_bmi_calculator');	
+		calculatorGraphObj = document.getElementById('bmi_calculator_graph');	
+		if(!useCm)document.getElementById('bmi_label_height').innerHTML = 'inches';
+		if(!useKg)document.getElementById('bmi_label_weight').innerHTML = 'pounds';
+		
+		var heightInput = document.getElementById('bmi_height');
+		heightInput.onblur = validateField; 
+		var widthInput = document.getElementById('bmi_height');
+		widthInput.onblur = validateField; 
+		
+		var labelDiv = document.createElement('DIV');
+		labelDiv.className = 'graphLabels';
+		calculatorGraphObj.appendChild(labelDiv);
+		for(var no=graphLabels.length-1;no>=0;no--){
+			var colorDiv = document.createElement('DIV');
+			colorDiv.className='square';
+			colorDiv.style.backgroundColor = graphColors[no];
+			colorDiv.innerHTML = '<span></span>';
+			labelDiv.appendChild(colorDiv);
+			
+			var labelDivTxt = document.createElement('DIV');
+			labelDivTxt.innerHTML = graphLabels[no];
+			labelDiv.appendChild(labelDivTxt);
+			labelDivTxt.className='label';
+			
+			if((no+1)%labelsPerRow==0){
+				var clearDiv = document.createElement('DIV');
+				clearDiv.className='clear';
+				labelDiv.appendChild(clearDiv);				
+			}		
+		}
+		var clearDiv = document.createElement('DIV');
+		clearDiv.className='clear';
+		labelDiv.appendChild(clearDiv);	
+						
+		var graphDiv = document.createElement('DIV');
+		graphDiv.className='barContainer';
+		graphDiv.style.width = barWidth + 'px';
+		graphDiv.style.left = Math.round(((calculatorGraphObj.offsetWidth/2) /2) - (barWidth/2)) + 'px';
+		graphDiv.style.height = barHeight;
+		calculatorGraphObj.appendChild(graphDiv);
+		
+		var totalHeight = 0;
+		for(var no=bmiArray.length-1;no>0;no--){
+			var aDiv = document.createElement('DIV');
+			aDiv.style.backgroundColor = graphColors[no-1];
+			aDiv.innerHTML = '<span></span>';
+			var height = Math.round(barHeight * (bmiArray[no] - bmiArray[no-1]) / bmiArray[bmiArray.length-1]) - 1;
+			aDiv.style.height = height + 'px';
+			graphDiv.appendChild(aDiv);	
+			
+		}		
+		
+		createWeightBar(1);
+	}
+	
+	</script>
+
+
+
+</head>
+<body>
+<div id="allcontent">
+<div id="header">
+<table width="800">
+  <tr>
+    <td width="50%" align="left"> 
+      <a href="index.html"><img src="healfiLogo30percent.gif" border="0"></a>
+    </td>
+    <td width="50%" align="RIGHT">
+      <img src="rules_pic.gif" border="3" style="border-color: rgb(0, 110, 185)">
+    </td>
+  </tr>
+</table>
+</div>
+
+<table><tr>
+<td width="150" valign="TOP" font-size="12px">
+<div id="sidebar">
+<br>
+
+<a href="playingcards.html"><img src="approachlogo2.gif" alt="The Playing Cards" border="3" style="border-color: #006EB9"></a><br>
+<br>
+
+
+<a href="rules.html">The Rules</a><br>
+<br>
+
+<a href="rewards.html">The Rewards</a><br>
+<br>
+
+
+<p><a href="score.html">Measure Your Health</a><br>
+<br>
+
+
+<a href="bookstore.html">Healfi Store</a><br>
+<br>
+
+<a href="happiggy.html"><img src="spargris1.gif" alt="HAPPIGGY" border="3" style="border-color: #006EB9"></a><br>
+<br>
+
+<a href="feedback.html">Suggestions Box</a><br>
+<br>
+
+<a href="newsletter.html">Healfi Newsletter</a><br>
+<br>
+
+<a href="why.html">Why this Project?</a><br>
+<br>
+
+<a href="jobs.html">Jobs</a><br>
+<br>
+
+<a href="investors.html">Investors</a><br>
+<br>
+
+<a href="contact.html">Contact</a><br>
+<br>
+
+<a href="index.html">Home</a></p>
+</div>
+</td>
+
+
+
+</td><td align="LEFT" valign="TOP">
+<div id="main"><table width="550px"><tr><td><h1>BMI-Calculator</h1>
+
+
+<p>Your Body Mass Index is equal to your weight in kilograms divided by your height in meters squared. It is expressed as BMI=kg/m2. A healthy BMI should lie between 19 and 25, but be aware that it is only a very rough health measure and many other factors need to be taken into account as well.</p>
+
+<br>
+
+<div id="dhtmlgoodies_bmi_calculator">
+	<div class="calculator_form">
+		<form name="bmi_calculator">
+			<table>
+				<tr>
+					<td><label for="bmi_height">Height</label>:</td><td><input class="textInput" type="text" id="bmi_height" name="bmi_height"> <span id="bmi_label_height">cm</span></td>
+				</tr>
+				<tr>
+					<td><label for="bmi_weight">Weight</label>:</td><td><input class="textInput" type="text" id="bmi_weight" name="bmi_weight"> <span id="bmi_label_weight">kg</span></td>
+				</tr>
+				<tr>
+					<td colspan="2"><input type="button" onclick="calculateBMI()" value="Find BMI"></td>
+				</tr>
+			</table>		
+		</form>	
+	</div>
+	<div class="calculator_graph" id="bmi_calculator_graph">
+	</div>
+</div>
+<script type="text/javascript">
+initBmiCalculator();
+</script>
+
+
+<br>
+
+
+
+</td></tr></table>
+</div>
+</td></tr></table>
+</div>
+
+
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-2065639-1";
+urchinTracker();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,15 @@
+/* IE fixes */
+.page-mid .outer {
+    height: 1px;
+    margin-right: 7px;
+}
+.page-mid .single .A .cards-nav .next {
+	right: 30px;
+}
+
+
+blockquote,
+div,
+img {
+    behavior: url(iepngfix.htc); 
+}
